@@ -1,28 +1,45 @@
 {
-  "manifest_version": 3,
-  "name": "org-treestyle-tab-bridge",
-  "version": "1.0",
+    "manifest_version": 3,
+    "name": "tst-org-backup",
+    "version": "1.0",
 
-  "description": "treestyle tab org-mode file interface.",
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'"
+    },
+    "host_permissions": [
+        "http://localhost/8080/tst-org-backup/read-file",
+        "http://localhost/8080/tst-org-backup/read-timestamp",
+        "http://localhost/8080/tst-org-backup/write"
+    ],
 
-  "icons": {
-      "48": "icons/org-treestyle-48.png",
-      "96": "icons/org-treestyle-96.png"
-  },
+    "permissions": ["storage"],
 
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "org-treestyle-bridge@zfazam",
-      "data_collection_permissions": {
-        "required": ["none"]
-      }
+    "description": "automatically backup TST tabs state to human-readable org-mode, and sync the current TST State to be that of the local file.",
+
+    "icons": {
+        "48": "icons/tst-org-backup-48.png",
+        "96": "icons/tst-org-backup-96.png"
+    },
+
+    "action": {
+        "default_icon": {
+            "48": "icons/tst-org-backup-48.png",
+            "96": "icons/tst-org-backup-96.png"
+        },
+        "default_popup": "popup/tst-org-backup.html"
+    },
+
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "tst-org-backup@zfazam",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
+        }
+    },
+
+    "background": {
+        "scripts": ["tst-org-backup.js"],
+        "type": "module"
     }
-  },
-
-  "background": {
-    "scripts": ["org-treestyle.js"],
-    "type": "module"
-  },
-
-  "host_permissions": ["http://localhost/8080/*"]
 }

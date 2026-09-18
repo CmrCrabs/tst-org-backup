@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+    <head> </head>
+    <body>
+        <link rel="stylesheet" href="styles.css" />
+        <h4>TST-ORG Backup</h4>
+        <button id="updateTSTBtn">Reopen TST State from Local</button>
+        <br />
+        <button id="updateLocalBtn">Save TST State to Local</button>
+        <br />
+        <div>
+            <input type="checkbox" id="toggleBackup" />
+            <label> Automatically Backup on Changes </label>
+        </div>
+        <div>
+            <b>STATUS:</b>
+            <label id="writtenLabel"> </label>
+        </div>
+
+        <div>
+            <input type="number" id="timeoutInput" min="500" />
+            <label> Timeout (ms) before auto-backup </label>
+        </div>
+
+        <script src="popup.js"></script>
+    </body>
+</html>
