@@ -44,7 +44,7 @@ async function getStatus() {
 function statusLabel(message) {
     switch (message) {
         case "pending":
-            return "Write is pending";
+            return "Write is pending.";
         case "written":
             return "Current state has been written.";
         case "suspended":

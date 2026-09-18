@@ -4,10 +4,11 @@ automatically backup [[https://addons.mozilla.org/en-GB/firefox/addon/tree-style
 Intended to enable the workflow of managing one's tab-pile from a more easily-parseable, bulk-editable org file, using their preferred editing setup within emacs.
 
 TODO workflow explainer "a sample workflow would be as follows..."
+TODO UI screenshot
 
 to best try to prevent any syncing mishaps that could result in any tab-losses, the extension will only write to the local file if:
 - auto-backups are manually toggled on from within the extension's popup (resets to being off on extension startup)
-- the file's modification time matches the extension's saved modification time for the file (on installation, manually update either tst , or local to resync)
+- the file's modification time matches the extension's saved modification time for the file (on installation, manually save to local)
 
 
 This was written by an (albeit inept) human; No generative AI has or ever will come close to anything I work on.
