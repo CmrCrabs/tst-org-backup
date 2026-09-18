@@ -69,6 +69,10 @@ stored in the format of:
 *** [[https://child-link.com][cool cats]]
 * [[https://epic-link.com][A different link]]
 ** [[https://more-websites.com][secret niche fragrance]]
+some plain text notes that are ignored
+** a-nested-folder
+*** [[https://the-website.site][even nicher fragrance]]
+*** [[https://the-website.site/url][even nicher fragrance root(a)]]
 #+end_src
 
 wherein plaintext org headings are converted to tst folders: `about:treestyletab-group?my-folder-name`
