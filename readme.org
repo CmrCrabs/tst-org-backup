@@ -1,9 +1,13 @@
 automatically backup [[https://addons.mozilla.org/en-GB/firefox/addon/tree-style-tab/][Tree Style Tab's]] heirarchical tab state to human-readable (and editable) org-mode, and on-request update the current TST State to be that of the local file.
 
+
+- [[Context]]
+- [[Installation]]
+- [[Org-mode file format]]
+- [[Styling]]
+
 ** Context 
 Intended to enable the workflow of managing one's tab-pile from a more easily-parseable, bulk-editable org file, using their preferred editing setup within emacs.
-
-TODO workflow explainer "a sample workflow would be as follows..."
 
 to best try to prevent any syncing mishaps that could result in any tab-losses, the extension will only write to the local file if:
 - auto-backups are manually toggled on from within the extension's popup (resets to being off on extension startup)
