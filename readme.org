@@ -4,16 +4,21 @@ automatically backup [[https://addons.mozilla.org/en-GB/firefox/addon/tree-style
 Intended to enable the workflow of managing one's tab-pile from a more easily-parseable, bulk-editable org file, using their preferred editing setup within emacs.
 
 TODO workflow explainer "a sample workflow would be as follows..."
-TODO UI screenshot
 
 to best try to prevent any syncing mishaps that could result in any tab-losses, the extension will only write to the local file if:
 - auto-backups are manually toggled on from within the extension's popup (resets to being off on extension startup)
 - the file's modification time matches the extension's saved modification time for the file (on installation, manually save to local)
 
+    using this extension in the way described does mean that there is a local web server exposing a .org file containing your browser tabs. there are surely innumerable other security issues but i imagine none of them are major.
 
-This was written by an (albeit inept) human; No generative AI has or ever will come close to anything I work on.
+    note that the extension does not support reopening priveleged tabs, due to limits of the webextension api.
+
 
 More than happy to accept any improvements another person may offer; Im sure I have violated many best-practices unintentionally and am willing to learn.
+This was written by an (albeit inept) human; No generative AI has or ever will come close to anything I work on.
+
+happy tab hoarding :)
+
 ** Installation
 Other than the extension itself, you need to run a http-server from within emacs so that the extension can access and modify a local file (the extension sends a request for emacs to do so, when needed). An example (but probably inefficient) way of doing so is shown below.
 
@@ -67,3 +72,21 @@ wherein plaintext org headings are converted to tst folders: `about:treestyletab
 and any pinned tabs are prefixed with "PINNED"
 
 any plain text under a heading is ignored, but the parsing is not very robust so please care with passing malformed org to the extension.
+
+there is adecent chance that any tab title that contains square brackets or other similar chicanery will break the parsing... realistically if this happens you will notice it whne trying to import and can go into the org file and spot the issue (as it would also break org mode rendering).
+
+
+** Popup Styling
+I left the styling of the extension intentionally sparse as my personal setup is very stylistcally opinionated. You could modify the extensions style in your `userContent.css`, using the web inspector to see classnames to target that which you wish to style.
+
+=userContent.css=
+#+begin_src css
+@document url-prefix("moz-extension://the-extension-uuid/") {
+    body {
+        your-style: here;
+    }
+}
+#+end_src
+
+*** ui preview
+[[./preview.png]]

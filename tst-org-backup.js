@@ -38,38 +38,11 @@ function onStartup() {
     updateWrittenState("suspended");
     updateBackupState(false);
 }
+
 function onErr(e) {
     console.error(e);
 }
 
-async function registerToTST() {
-    const result = await browser.runtime
-        .sendMessage(TST_ID, {
-            type: "register-self",
-            name: browser.i18n.getMessage("tst-org-backup"),
-            icons: browser.runtime.getManifest().icons,
-            listeningTypes: [
-                "wait-for-shutdown",
-                "ready",
-                "permissions-changed",
-                "tree-attached",
-                "tree-detached",
-            ],
-            allowBulkMessaging: true,
-            style: ` `,
-            permissions: ["tabs"],
-        })
-        .catch(onErr);
-    console.log("Registered to TST");
-
-    browser.runtime
-        .sendMessage(TST_ID, {
-            type: "wait-for-shutdown",
-        })
-        .finally(() => {
-            console.log("TST has been shutdown.");
-        });
-}
 function debounce(callback, wait) {
     let timeoutId = null;
 
@@ -90,27 +63,31 @@ function debounce(callback, wait) {
 
     return debounced;
 }
+async function readTSTTabs() {
+    let raw_tree = await browser.runtime.sendMessage(TST_ID, {
+        type: "get-tree",
+        window: 0,
+        tabs: "*",
+    });
+
+    return raw_tree.map((t) => ({
+        id: t.id,
+        indent: t.indent,
+        index: t.index,
+        pinned: t.pinned,
+        group: t.url.includes("group-tab.html?"),
+        url: t.url,
+        title: t.title,
+    }));
+}
 
 function generateOrg(tabs) {
     return tabs
-        .map((t) => `${"*".repeat(t.indent + 1)} ${t.pinned ? "PINNED " : ""}[[${t.url}][${t.title}]]`)
+        .map((t) => {
+            let url = t.group ? t.title : `[[${t.url}][${t.title}]]`;
+            return `${"*".repeat(t.indent + 1)} ${t.pinned ? "PINNED " : ""}${url}`;
+        })
         .join("\n");
-}
-function parseOrg(org) {
-    return org
-        .split("\n")
-        .filter((l) => l[0] === "*")
-        .map((line, index) => {
-            let l = line.split("[");
-            return {
-                indent: l[0].split(" ").at(0).trim().length - 1,
-                id: null,
-                pinned: l[0].includes("PINNED"),
-                index: index,
-                url: l[2].slice(0, -1),
-                title: l[3].slice(0, -2),
-            };
-        });
 }
 
 async function writeEmacs(body) {
@@ -124,32 +101,10 @@ async function writeEmacs(body) {
     return response;
 }
 
-async function readLocalFile() {
-    let response = await fetch("http://localhost:8080/tst-org-backup/read-file").catch(onErr);
-    return await response.text();
-}
-
 async function readTimestamp() {
     let response = await fetch("http://localhost:8080/tst-org-backup/read-timestamp").catch(onErr);
     let responseStr = await response.text();
     return parseInt(responseStr.replaceAll(" ", ""));
-}
-
-async function readTSTTabs() {
-    let raw_tree = await browser.runtime.sendMessage(TST_ID, {
-        type: "get-tree",
-        window: 0,
-        tabs: "*",
-    });
-
-    return raw_tree.map((t) => ({
-        id: t.id,
-        indent: t.indent,
-        index: t.index,
-        pinned: t.pinned,
-        url: t.url,
-        title: t.title,
-    }));
 }
 
 async function updateLocalState(override = false) {
@@ -168,16 +123,72 @@ async function updateLocalState(override = false) {
         } else {
             console.log("...Write stopped, writing suspended.");
         }
+        updateWrittenState((await Writable()) ? "written" : "suspended");
     }
-    updateWrittenState((await Writable()) ? "written" : "suspended");
+}
+
+async function readLocalFile() {
+    let response = await fetch("http://localhost:8080/tst-org-backup/read-file").catch(onErr);
+    return await response.text();
+}
+
+function parseOrg(org) {
+    return org
+        .split("\n")
+        .filter((l) => l[0] === "*")
+        .map((line, index) => {
+            if (line.includes("[")) {
+                let l = line.split("[");
+                return {
+                    indent: l[0].split(" ").at(0).trim().length - 1,
+                    id: null,
+                    pinned: l[0].includes("PINNED"),
+                    index: index,
+                    url: l[2].slice(0, -1),
+                    title: l[3].slice(0, -2),
+                };
+            } else {
+                let l = line.split(" ");
+                return {
+                    indent: l[0].length - 1,
+                    id: null,
+                    pinned: false,
+                    index: index,
+                    url: `ext+treestyletab:group?title=${l[1]}`,
+                    title: l[1],
+                };
+            }
+        });
 }
 
 async function updateTSTState() {
     let org = await readLocalFile();
     let localTabs = parseOrg(org);
-    let tstTabs = await readTSTTabs();
 
-    // TODO open , pin, indent
+    let currentTabs = await browser.tabs.query({ currentWindow: true });
+    let tempTab = await browser.tabs.create({});
+    currentTabs.forEach((tab) => {
+        browser.tabs.remove(tab.id);
+    });
+
+    for (const tab of localTabs) {
+        if (tab.url.includes("about:")) {
+            continue;
+        }
+        let createdTab = await browser.tabs.create({
+            index: tab.index,
+            url: tab.url,
+            pinned: tab.pinned,
+        });
+
+        for (let i = 0; i < tab.indent; i++) {
+            let success = await browser.runtime.sendMessage(TST_ID, {
+                type: "indent",
+                tab: createdTab.id,
+            });
+        }
+    }
+    browser.tabs.remove(tempTab.id);
 
     console.log("Synced TST state with local file.");
 
@@ -270,8 +281,7 @@ async function onMessage(message, sender, sendResponse) {
                     sendResponse("success");
                     break;
                 case "BackupOn":
-                    updateBackupState(true);
-
+                    await updateBackupState(true);
                     if (writtenState === "pending") {
                         updateLocalState();
                     }
@@ -284,4 +294,33 @@ async function onMessage(message, sender, sendResponse) {
             }
             break;
     }
+}
+
+async function registerToTST() {
+    const result = await browser.runtime
+        .sendMessage(TST_ID, {
+            type: "register-self",
+            name: browser.i18n.getMessage("tst-org-backup"),
+            icons: browser.runtime.getManifest().icons,
+            listeningTypes: [
+                "wait-for-shutdown",
+                "ready",
+                "permissions-changed",
+                "tree-attached",
+                "tree-detached",
+            ],
+            allowBulkMessaging: true,
+            style: ` `,
+            permissions: ["tabs"],
+        })
+        .catch(onErr);
+    console.log("Registered to TST");
+
+    browser.runtime
+        .sendMessage(TST_ID, {
+            type: "wait-for-shutdown",
+        })
+        .finally(() => {
+            console.log("TST has been shutdown.");
+        });
 }
