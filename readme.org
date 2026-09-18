@@ -1,10 +1,11 @@
 automatically backup [[https://addons.mozilla.org/en-GB/firefox/addon/tree-style-tab/][Tree Style Tab's]] heirarchical tab state to human-readable (and editable) org-mode, and on-request update the current TST State to be that of the local file.
 
 
-- [[#context]]
-- [[#installation]]
-- [[#org-mode-file-format]]
-- [[#styling]]
+- [[#context][Context]]
+- [[#installation][Installation]]
+- [[#org-mode-file-format][Org File Format]]
+- [[#popup-styling][Popup Styling]]
+- [[#ui-preview][UI Preview]]
 
 ** Context 
 Intended to enable the workflow of managing one's tab-pile from a more easily-parseable, bulk-editable org file, using their preferred editing setup within emacs.
@@ -16,7 +17,6 @@ to best try to prevent any syncing mishaps that could result in any tab-losses, 
     using this extension in the way described does mean that there is a local web server exposing a .org file containing your browser tabs. there are surely innumerable other security issues but i imagine none of them are major.
 
     note that the extension does not support reopening priveleged tabs, due to limits of the webextension api.
-
 
 More than happy to accept any improvements another person may offer; Im sure I have violated many best-practices unintentionally and am willing to learn.
 This was written by an (albeit inept) human; No generative AI has or ever will come close to anything I work on.
@@ -77,7 +77,7 @@ and any pinned tabs are prefixed with "PINNED"
 
 any plain text under a heading is ignored, but the parsing is not very robust so please care with passing malformed org to the extension.
 
-there is adecent chance that any tab title that contains square brackets or other similar chicanery will break the parsing... realistically if this happens you will notice it whne trying to import and can go into the org file and spot the issue (as it would also break org mode rendering).
+there is a decent chance that any tab title that contains square brackets or other similar chicanery will break the parsing... realistically if this happens you will notice it whne trying to import and can go into the org file and spot the issue (as it would also break org mode rendering).
 
 
 ** Popup Styling
