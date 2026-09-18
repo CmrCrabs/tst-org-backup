@@ -24,6 +24,10 @@ This was written by an (albeit inept) human; No generative AI has or ever will c
 happy tab hoarding :)
 
 ** Installation
+This extension only supports firefox , with some reasonably recent version likely being required.
+
+To install the extension, open `about:debugging` and load `tst-org-backup.zip` from this repo under Temporary Extensions.
+
 Other than the extension itself, you need to run a http-server from within emacs so that the extension can access and modify a local file (the extension sends a request for emacs to do so, when needed). An example (but probably inefficient) way of doing so is shown below.
 
 #+begin_src elisp

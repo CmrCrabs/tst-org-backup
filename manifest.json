@@ -14,7 +14,7 @@
 
     "permissions": ["storage"],
 
-    "description": "automatically backup TST tabs state to human-readable org-mode, and sync the current TST State to be that of the local file.",
+    "description": "automatically backup tree-style-tab's state to human-readable and emacs-editable org-mode, and open the contents of a formatted emacs org-mode file into a tree-style-tabs tree.",
 
     "icons": {
         "48": "icons/tst-org-backup-48.png",
