@@ -58,9 +58,9 @@ Other than the extension itself, you need to run a http-server from within emacs
 #+end_src
 
 the extension expects the following endpoints:
-- http://localhost/8080/tst-org-backup/read-file (should return the raw org file as a response)
-- http://localhost/8080/tst-org-backup/read-timestamp (should return the modification time of the file in the same format as defined in =C-h f current-time=)
-- http://localhost/8080/tst-org-backup/write (up to you)
+- [[http://localhost/8080/tst-org-backup/read-file]] (should return the raw org file as a response)
+- [[http://localhost/8080/tst-org-backup/read-timestamp]] (should return the modification time of the file in the same format as defined in =C-h f current-time=)
+- [[http://localhost/8080/tst-org-backup/write]] (up to you)
 
 ** Org-mode file format
 stored in the format of:
@@ -79,7 +79,7 @@ some plain text notes that are ignored
 *** [[https://the-website.site/url][even nicher fragrance root(a)]]
 #+end_src
 
-wherein plaintext org headings are converted to tst folders: `about:treestyletab-group?my-folder-name`
+wherein plaintext org headings are converted to tst folders: =ext+treestyletab:group?title=my-folder-name=
 
 and any pinned tabs are prefixed with "PINNED"
 
