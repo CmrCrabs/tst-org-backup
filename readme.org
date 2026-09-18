@@ -26,7 +26,7 @@ happy tab hoarding :)
 ** Installation
 This extension only supports firefox , with some reasonably recent version likely being required.
 
-To install the extension, open `about:debugging` and load `tst-org-backup.zip` from this repo under Temporary Extensions.
+To install the extension, open =about:debugging= and load =tst-org-backup.zip= from this repo under Temporary Extensions.
 
 Other than the extension itself, you need to run a http-server from within emacs so that the extension can access and modify a local file (the extension sends a request for emacs to do so, when needed). An example (but probably inefficient) way of doing so is shown below.
 
@@ -59,7 +59,7 @@ Other than the extension itself, you need to run a http-server from within emacs
 
 the extension expects the following endpoints:
 - http://localhost/8080/tst-org-backup/read-file (should return the raw org file as a response)
-- http://localhost/8080/tst-org-backup/read-timestamp (should return the modification time of the file in the same format as defined in `C-h f current-time`)
+- http://localhost/8080/tst-org-backup/read-timestamp (should return the modification time of the file in the same format as defined in =C-h f current-time=)
 - http://localhost/8080/tst-org-backup/write (up to you)
 
 ** Org-mode file format
@@ -91,7 +91,7 @@ there is a decent chance that any tab title that contains square brackets or oth
 ** Popup Styling
 I left the styling of the extension intentionally sparse as my personal setup is very stylistcally opinionated. You could modify the extensions style in your `userContent.css`, using the web inspector to see classnames to target that which you wish to style.
 
-=userContent.css=
+_userContent.css_
 #+begin_src css
 @document url-prefix("moz-extension://the-extension-uuid/") {
     body {
