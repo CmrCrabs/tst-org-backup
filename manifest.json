@@ -1,15 +1,15 @@
 {
     "manifest_version": 3,
-    "name": "tst-org-backup",
+    "name": "tree-style-tab org-mode sync",
     "version": "1.0",
 
     "content_security_policy": {
         "extension_pages": "script-src 'self'"
     },
     "host_permissions": [
-        "http://localhost/8080/tst-org-backup/read-file",
-        "http://localhost/8080/tst-org-backup/read-timestamp",
-        "http://localhost/8080/tst-org-backup/write"
+        "http://localhost/8080/tst-org-sync/read-file",
+        "http://localhost/8080/tst-org-sync/read-timestamp",
+        "http://localhost/8080/tst-org-sync/write"
     ],
 
     "permissions": ["storage"],
@@ -17,21 +17,21 @@
     "description": "automatically backup tree-style-tab's state to human-readable and emacs-editable org-mode, and open the contents of a formatted emacs org-mode file into a tree-style-tabs tree.",
 
     "icons": {
-        "48": "icons/tst-org-backup-48.png",
-        "96": "icons/tst-org-backup-96.png"
+        "48": "icons/tst-org-sync-48.png",
+        "96": "icons/tst-org-sync-96.png"
     },
 
     "action": {
         "default_icon": {
-            "48": "icons/tst-org-backup-48.png",
-            "96": "icons/tst-org-backup-96.png"
+            "48": "icons/tst-org-sync-48.png",
+            "96": "icons/tst-org-sync-96.png"
         },
-        "default_popup": "popup/tst-org-backup.html"
+        "default_popup": "popup/tst-org-sync.html"
     },
 
     "browser_specific_settings": {
         "gecko": {
-            "id": "tst-org-backup@zfazam",
+            "id": "tst-org-sync@zfazam",
             "data_collection_permissions": {
                 "required": ["none"]
             }
@@ -39,7 +39,7 @@
     },
 
     "background": {
-        "scripts": ["tst-org-backup.js"],
+        "scripts": ["tst-org-sync.js"],
         "type": "module"
     }
 }

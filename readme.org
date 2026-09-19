@@ -1,22 +1,21 @@
 automatically backup [[https://addons.mozilla.org/en-GB/firefox/addon/tree-style-tab/][Tree Style Tab's]] heirarchical tab state to human-readable (and editable) org-mode, and on-request update the current TST State to be that of the local file.
 
-
 - [[#context][Context]]
 - [[#installation][Installation]]
 - [[#org-mode-file-format][Org File Format]]
 - [[#popup-styling][Popup Styling]]
 - [[#ui-preview][UI Preview]]
 
-** Context 
+** Context
 Intended to enable the workflow of managing one's tab-pile from a more easily-parseable, bulk-editable org file, using their preferred editing setup within emacs.
 
 to best try to prevent any syncing mishaps that could result in any tab-losses, the extension will only write to the local file if:
 - auto-backups are manually toggled on from within the extension's popup (resets to being off on extension startup)
 - the file's modification time matches the extension's saved modification time for the file (on installation, manually save to local)
 
-    using this extension in the way described does mean that there is a local web server exposing a .org file containing your browser tabs. there are surely innumerable other security issues but i imagine none of them are major.
+using this extension in the way described does mean that there is a local web server exposing a .org file containing your browser tabs. there are surely innumerable other security issues but i imagine none of them are major.
 
-    note that the extension does not support reopening priveleged tabs, due to limits of the webextension api.
+note that the extension does not support reopening priveleged tabs, due to limits of the webextension api.
 
 More than happy to accept any improvements another person may offer; Im sure I have violated many best-practices unintentionally and am willing to learn.
 This was written by an (albeit inept) human; No generative AI has or ever will come close to anything I work on.
@@ -26,7 +25,7 @@ happy tab hoarding :)
 ** Installation
 This extension only supports firefox , with some reasonably recent version likely being required.
 
-To install the extension, open =about:debugging= and load =tst-org-backup.zip= from this repo under Temporary Extensions.
+To install the extension, open =about:debugging= and load =tst-org-sync.zip= from this repo under Temporary Extensions.
 
 Other than the extension itself, you need to run a http-server from within emacs so that the extension can access and modify a local file (the extension sends a request for emacs to do so, when needed). An example (but probably inefficient) way of doing so is shown below.
 
@@ -38,15 +37,15 @@ Other than the extension itself, you need to run a http-server from within emacs
   (httpd-start)
   (setq httpd-port 8080))
 
-(httpd-servlet tst-org-backup/read-file text/plain ()
+(httpd-servlet tst-org-sync/read-file text/plain ()
   (insert-file-contents my/local-file-path))
 
-(httpd-servlet tst-org-backup/read-timestamp text/plain ()
+(httpd-servlet tst-org-sync/read-timestamp text/plain ()
   (let* ((modification-time (file-attribute-modification-time (file-attributes my/local-file-path)))
          (modification-string (substring (format "%s" modification-time) 1 -1)))
     (insert modification-string)))
 
-(defun httpd/tst-org-backup/write (proc path &rest args)
+(defun httpd/tst-org-sync/write (proc path &rest args)
   "PROC PATH ARGS."
   (let* ((body (cdr (car (last (cdr (car (last args))))))) ;; this is really ugly but works?
          (body-string (substring (format "%s" body) 1 -1)))
@@ -58,9 +57,9 @@ Other than the extension itself, you need to run a http-server from within emacs
 #+end_src
 
 the extension expects the following endpoints:
-- [[http://localhost/8080/tst-org-backup/read-file]] (should return the raw org file as a response)
-- [[http://localhost/8080/tst-org-backup/read-timestamp]] (should return the modification time of the file in the same format as defined in =C-h f current-time=)
-- [[http://localhost/8080/tst-org-backup/write]] (up to you)
+- [[http://localhost/8080/tst-org-sync/read-file]] (should return the raw org file as a response)
+- [[http://localhost/8080/tst-org-sync/read-timestamp]] (should return the modification time of the file in the same format as defined in =C-h f current-time=)
+- [[http://localhost/8080/tst-org-sync/write]] (up to you)
 
 ** Org-mode file format
 stored in the format of:

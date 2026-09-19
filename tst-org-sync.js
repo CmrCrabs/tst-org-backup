@@ -1,15 +1,19 @@
 const TST_ID = "treestyletab@piro.sakura.ne.jp";
 const EXT_ID = browser.runtime.getManifest().browser_specific_settings.gecko.id;
 
-registerToTST();
-let timeout = (await browser.storage.local.get("timeout")).timeout;
-let scheduleLocalUpdate = debounce(updateLocalState, timeout);
+browser.runtime.onInstalled.addListener(onInstalled);
+browser.runtime.onStartup.addListener(onStartup);
 
-browser.runtime.onMessageExternal.addListener(onMessageExternal);
+let scheduleLocalUpdate;
+
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    onMessage(message, sender, sendResponse).catch(onErr);
+    (async () => {
+        await initialise();
+        await onMessage(message, sender, sendResponse);
+    })();
     return true;
 });
+browser.runtime.onMessageExternal.addListener(onMessageExternal);
 
 browser.tabs.onRemoved.addListener(() => {
     updateWrittenState("pending");
@@ -27,11 +31,18 @@ browser.tabs.onUpdated.addListener(
     { properties: ["status", "pinned"] },
 );
 
-browser.runtime.onInstalled.addListener(onInstalled);
-browser.runtime.onStartup.addListener(onStartup);
+async function initialise() {
+    const { timeout = 5000 } = await browser.storage.local.get("timeout");
+
+    scheduleLocalUpdate = debounce(updateLocalState, timeout);
+
+    await registerToTST();
+}
 
 function onInstalled() {
-    browser.storage.local.set({ timeout: 10000 });
+    browser.storage.local.set({ timeout: 5000 });
+    updateWrittenState("suspended");
+    updateBackupState(false);
 }
 
 function onStartup() {
@@ -91,7 +102,7 @@ function generateOrg(tabs) {
 }
 
 async function writeEmacs(body) {
-    let response = await fetch("http://localhost:8080/tst-org-backup/write", {
+    let response = await fetch("http://localhost:8080/tst-org-sync/write", {
         method: "POST",
         headers: {
             "Content-Type": "text/plain",
@@ -102,7 +113,7 @@ async function writeEmacs(body) {
 }
 
 async function readTimestamp() {
-    let response = await fetch("http://localhost:8080/tst-org-backup/read-timestamp").catch(onErr);
+    let response = await fetch("http://localhost:8080/tst-org-sync/read-timestamp").catch(onErr);
     let responseStr = await response.text();
     return parseInt(responseStr.replaceAll(" ", ""));
 }
@@ -128,7 +139,7 @@ async function updateLocalState(override = false) {
 }
 
 async function readLocalFile() {
-    let response = await fetch("http://localhost:8080/tst-org-backup/read-file").catch(onErr);
+    let response = await fetch("http://localhost:8080/tst-org-sync/read-file").catch(onErr);
     return await response.text();
 }
 
@@ -207,9 +218,7 @@ async function updateBackupState(state) {
         await browser.storage.local.set({ autoBackup: state });
 
         console.log(`Auto Backups have been ${state ? "enabled" : "disabled"}.`);
-        browser.runtime
-            .sendMessage("tst-org-backup@zfazam", `${state ? "backupOn" : "backupOff"}`)
-            .catch((e) => {});
+        browser.runtime.sendMessage(EXT_ID, `${state ? "backupOn" : "backupOff"}`).catch((e) => {});
     }
 }
 
@@ -218,7 +227,7 @@ async function updateWrittenState(state) {
     if (writtenState != state) {
         await browser.storage.local.set({ writtenState: state });
 
-        browser.runtime.sendMessage("tst-org-backup@zfazam", state).catch((e) => {});
+        browser.runtime.sendMessage(EXT_ID, state).catch((e) => {});
     }
 }
 
@@ -276,8 +285,8 @@ async function onMessage(message, sender, sendResponse) {
 
                 case "updateTimeout":
                     timeout = message.value;
-                    scheduleLocalUpdate.setTimeout(timeout);
                     await browser.storage.local.set({ timeout: message.value });
+                    scheduleLocalUpdate.setTimeout(timeout);
                     sendResponse("success");
                     break;
                 case "BackupOn":

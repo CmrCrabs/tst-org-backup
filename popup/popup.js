@@ -5,15 +5,15 @@ let writtenLabel = document.getElementById("writtenLabel");
 let timeoutInput = document.getElementById("timeoutInput");
 
 async function updateTST() {
-    await browser.runtime.sendMessage("tst-org-backup@zfazam", { type: "updateTST" });
+    await browser.runtime.sendMessage(EXT_ID, { type: "updateTST" });
 }
 
 async function updateLocal() {
-    await browser.runtime.sendMessage("tst-org-backup@zfazam", { type: "updateLocal" });
+    await browser.runtime.sendMessage(EXT_ID, { type: "updateLocal" });
 }
 
 async function updateTimeout() {
-    await browser.runtime.sendMessage("tst-org-backup@zfazam", {
+    await browser.runtime.sendMessage(EXT_ID, {
         type: "updateTimeout",
         value: timeoutInput.value,
     });
@@ -24,20 +24,18 @@ async function toggleBackup() {
 
     switch (toggleBtn.checked) {
         case true:
-            await browser.runtime.sendMessage("tst-org-backup@zfazam", { type: "BackupOn" });
+            await browser.runtime.sendMessage(EXT_ID, { type: "BackupOn" });
             break;
         case false:
-            await browser.runtime.sendMessage("tst-org-backup@zfazam", { type: "BackupOff" });
+            await browser.runtime.sendMessage(EXT_ID, { type: "BackupOff" });
             break;
     }
 }
 
 async function getStatus() {
-    let status = await browser.runtime
-        .sendMessage("tst-org-backup@zfazam", { type: "statusUpdate" })
-        .catch((e) => {
-            console.log("Background script has not been started.");
-        });
+    let status = await browser.runtime.sendMessage(EXT_ID, { type: "statusUpdate" }).catch((e) => {
+        console.log("Background script has not been started.");
+    });
     return status;
 }
 
@@ -48,7 +46,7 @@ function statusLabel(message) {
         case "written":
             return "Current state has been written.";
         case "suspended":
-            return "Writing to disk suspended.";
+            return "Writing suspended, manual intervention required.";
     }
 }
 
